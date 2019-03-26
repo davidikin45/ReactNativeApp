@@ -301,6 +301,43 @@ const Example = () => {
 }
 ```
 
+## Lifecycle Methods Creating
+1. constructor(props)
+2. componentWillMount()
+3. render()
+4. renderChildComponents
+5. componentDidMount() //Called immediately after first render once.
+
+## Lifecycle Methods Updating
+* Component shouldComponentUpdate return true. By default update occurs if props or state is set regardless if they have changed.
+* PureComponent shouldComponentUpdate will compare props and state value before rendering.
+
+1. componentWillReceiveProps(nextProps) - Only if updated externally - Deprecated
+1. static getDerivedStateFromProps(props, state) - return new state based on props or null for no update
+2. shouldComponentUpdate(nextProps, nextState) - performance optimization - By default returns true
+3. componentWillUpdate(nextProps, nextState) - Deprecated
+4. render()
+5. getSnapshotBeforeUpdate(prevProps, prevState) - return snapshot object or null. Any value returned by this lifecycle will be passed as a parameter to componentDidUpdate().
+6. updateChildComponentProps
+7. componentDidUpdate(prevProps, prevState, snapshot)
+
+## Lifecycle Methods Unmount
+```
+componentWillUnmount()
+```
+
+## Lifecycle Methods Error
+```
+componentDidCatch()
+```
+
+## Old vs New Life Cycle
+* [React Component Life Cycle Old vs New](https://medium.com/@kartikagarwal01/react-component-lifecycle-old-vs-new-32757aee5850)
+
+![alt text](old-life-cycle.jpeg "Old Life Cycle")
+
+![alt text](life-cycle.jpeg "New Life Cycle")
+
 ## Authors
 
 * **David Ikin**
