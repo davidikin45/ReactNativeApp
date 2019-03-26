@@ -4,17 +4,27 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint ."
   },
   "dependencies": {
-    "react": "16.6.0-alpha.8af6728",
-    "react-native": "0.57.4"
+    "moment": "^2.24.0",
+    "react": "16.8.3",
+    "react-native": "0.59.2",
+    "react-native-action-button": "^2.8.5",
+    "react-native-gesture-handler": "^1.1.0",
+    "react-native-modal-datetime-picker": "^6.1.0",
+    "react-navigation": "^3.5.1"
   },
   "devDependencies": {
-    "babel-jest": "23.6.0",
-    "jest": "23.6.0",
-    "metro-react-native-babel-preset": "0.48.3",
-    "react-test-renderer": "16.6.0-alpha.8af6728"
+    "@babel/core": "7.4.0",
+    "@babel/runtime": "^7.4.2",
+    "@react-native-community/eslint-config": "0.0.3",
+    "babel-jest": "24.5.0",
+    "eslint": "5.15.3",
+    "jest": "24.5.0",
+    "metro-react-native-babel-preset": "0.53.1",
+    "react-test-renderer": "16.8.3"
   },
   "jest": {
     "preset": "react-native"
