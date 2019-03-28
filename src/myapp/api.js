@@ -3,7 +3,7 @@ import uuid from 'uuid';
 class Api {
   
    async getEvents() {
-    let response = await fetch('http://192.168.3.103:3000/events');
+    let response = await fetch('http://192.168.3.103:3000/events?1');
     let responseJson = await response.json();
     return responseJson.map(e => ({
       ...e,

@@ -1,0 +1,1 @@
+cd "%USERPROFILE%\AppData\Local\Android\sdk\emulator" && .\emulator -avd default

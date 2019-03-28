@@ -1,7 +1,15 @@
 # Getting Started with React Native
 
-## Install Node.js, JDK, Python 2, expo-cli & react-native-cli
+## About
+* iOS - Swift or Obj-Chocolatey
+* Android - Java or Kotlin
+* [Ionic](https://ionicframework.com/) renders HTML in app container. Classified as hybrid rather than native mobile app. 
+* [Flutter](https://flutter.dev/)
+* ES6+, Flow, TypeScript
+* Native (UI) and JavaScript (React) threads 
+* Use FlatList or SectionList instead of ScrollView
 
+## Install Node.js, JDK, Python 2, expo-cli & react-native-cli, react-devtools
 * [Getting Started with Expo CLI and React Native CLI](https://facebook.github.io/react-native/docs/getting-started)
 
 1. [Node.js](https://nodejs.org/en/).
@@ -14,6 +22,7 @@ choco install -y python2 jdk8
 ```
 npm install -g expo-cli
 npm install -g react-native-cli
+npm install -g react-devtools
 ```
 4. Install [Android Studio](https://developer.android.com/studio/) following the instructions [Building Projects with Native Code](https://facebook.github.io/react-native/docs/getting-started) documentation.
 5. On phone download 'Expo' app.
@@ -35,12 +44,23 @@ react-native init myapp
 cd myapp
 npm install --save react-navigation
 ```
-2. Open the android folder in Android Studio
-3. Open Tools > Android > AVD Manager
-4. Create new Virtual Device OR Settings > About phone > Sotware information > Build number x7, Enable Settings > Developer Options > USB debugging, ADB WiFi Connect
-5. Launch virtual device
+2. Add the following to App.js to debug http calls
+```
+GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest
+```
+3. Open the android folder in Android Studio
+4. Open Tools > Android > AVD Manager
+5. Create new Virtual Device OR Settings > About phone > Sotware information > Build number x7, Enable Settings > Developer Options > USB debugging, ADB WiFi Connect
+6. Launch virtual device
 ![alt text](virtual-device.jpg "Virtual Device")
-6. In terminal run the following commands
+
+```
+cd "%USERPROFILE%\AppData\Local\Android\sdk\emulator" && .\emulator -avd default
+```
+7. In terminal run the following commands
+```
+react-devtools
+```
 ```
 cd myapp
 npm start -- --reset-cache
@@ -51,11 +71,43 @@ cd myapp
 react-native run-android
 ```
 
-## About
-* iOS - Swift or Obj-Chocolatey
-* Android - Java or Kotlin
-* [Ionic](https://ionicframework.com/) renders HTML in app container. Classified as hybrid rather than native mobile app. 
-* [Flutter](https://flutter.dev/)
+## Api Logging to Chrome Dev Tools
+
+index.js
+```
+if (__DEV__) {
+    // Route network requests through Chrome's native XMLHttpRequest
+    GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest;
+  
+    // Use native FormData for native XMLHttpRequest set above
+    GLOBAL.FormData = GLOBAL.originalFormData ? GLOBAL.originalFormData : GLOBAL.FormData;
+
+    // Use native Blob for native XMLHttpRequest set above
+    GLOBAL.Blob = GLOBAL.originalBlob || GLOBAL.Blob;
+  
+    // Use native FileReader to read native Blob set above
+    GLOBAL.FileReader = GLOBAL.originalFileReader || GLOBAL.FileReader;
+
+    // fetch logger
+    global._fetch = fetch;
+    global.fetch = function (uri, options, ...args) {
+    return global._fetch(uri, options, ...args).then((response) => {
+        console.log('Fetch', { request: { uri, options, ...args }, response });
+        return response;
+    });
+    };
+}
+  
+import {AppRegistry} from 'react-native';
+import App from './App';
+import {name as appName} from './app.json';
+
+AppRegistry.registerComponent(appName, () => App);
+```
+
+## Useful commands
+* Ctrl + M = Open Menu > Enable Hot Reload, Enable Debugging
+* [react-devtools](https://www.npmjs.com/package/react-devtools)
 
 ## Learning React, Redux Thunk & Redux Saga
 [Pluralsight Free Subscription](https://devopscube.com/pluralsight-free-subscription/)
@@ -202,6 +254,100 @@ EventCard.propTypes = {
 };
 ```
 
+## Navigation
+```
+npm install --save react-navigation
+```
+
+```
+import React, {Component} from 'react';
+import {Platform} from 'react-native';
+import EventList from './components/EventList';
+import EventForm from './components/EventForm';
+import { createStackNavigator, createAppContainer } from 'react-navigation';
+
+const instructions = Platform.select({
+  ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
+  android:
+    "Double tap R on your keyboard to reload,\n" +
+    "Shake or press menu button for dev menu"
+});
+
+const MainNavigator = createStackNavigator({
+    list: {screen: EventList,  navigationOptions:() => ({
+      title: 'Your Events'
+    })},
+    form: {screen: EventForm,  navigationOptions:() => ({
+      title: 'Add an event'
+    })},
+  });
+  
+const App = createAppContainer(MainNavigator);
+
+export default App;
+```
+
+```
+import React, { useState, useEffect } from 'react';
+import { Alert, FlatList, Text } from 'react-native';
+import ActionButton from 'react-native-action-button';
+
+import EventCard from './EventCard';
+import api from '../api';
+
+const EventList = (props) =>  {
+    const [tick, setTick] = useState('');
+    const [events, setEvents] = useState([]);
+
+    fetchData = async () => {
+        try
+        {
+          const events = await api.getEvents();
+          setEvents(events);
+        }
+        catch (e) {
+          console.error(e);
+        }
+      }
+
+    useEffect(() => {
+        //const events = require('../db.json').events.map(e => ({
+            //...e,
+            //date: new Date(e.date),
+          //}));
+          //setEvents(events);
+
+          setInterval(() => {
+            setTick(Date.now());
+          }, 1000);
+
+          props.navigation.addListener('didFocus', () => {             
+            fetchData();
+          });
+    }, []);
+
+    handleAddEvent = () =>{
+        props.navigation.navigate('form');
+        props.navigation.goBack();
+    }
+
+    return [
+        <FlatList
+        key="flatlist"
+        data={events}
+        extraData={tick}
+        renderItem={({item}) => <EventCard event={item}/>}
+        keyExtractor={item => item.id}
+        />,
+        <ActionButton key="fab"
+            onPress={handleAddEvent}
+            buttonColor="rgba(231, 76, 60, 1)"></ActionButton>
+    ]
+}
+
+export default EventList;
+```
+
 ## Hooks
 
 * Hooks don’t work inside classes — they let you use React without classes
@@ -337,6 +483,33 @@ componentDidCatch()
 ![alt text](old-life-cycle.jpeg "Old Life Cycle")
 
 ![alt text](life-cycle.jpeg "New Life Cycle")
+
+## Set State Cheatsheet
+* When setting state in componentDidUpdate it needs to be conditional to prevent an infinite loop.
+
+![alt text](setstate.png "setState Cheatsheet")
+
+## Cross Platform
+```
+const instructions = Platform.select({
+  ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
+  android:
+    "Double tap R on your keyboard to reload,\n" +
+    "Shake or press menu button for dev menu"
+});
+
+const style = StyleSheet.create({
+	container:{
+		flex: 1,
+		backgroundColor: 'blue',
+		...Platform.select({
+		  ios: {
+			  backgroundColor: 'red'
+		  }
+		})
+	}
+});
+```
 
 ## Authors
 
