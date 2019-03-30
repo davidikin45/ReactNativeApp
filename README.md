@@ -14,6 +14,10 @@
 * [remote-redux-devtools](https://github.com/zalmoxisus/remote-redux-devtools)
 * [remotedev-server](https://github.com/zalmoxisus/remotedev-server)
 * [remotedev.io](http://remotedev.io/local/) OR [http://localhost:8000](http://localhost:8000)
+* [https://httpstat.us/]
+
+## Useful commands
+* Ctrl + M = Open Menu > Enable Hot Reload, Enable Debugging
 
 ## Install Node.js, JDK, Python 2, expo-cli & react-native-cli, react-devtools
 * [Getting Started with Expo CLI and React Native CLI](https://facebook.github.io/react-native/docs/getting-started)
@@ -53,6 +57,9 @@ cd myapp
 npm install --save react-navigation axios redux react-redux redux-persist redux-thunk redux-saga redux-logger reselect ramda @react-native-community/async-storage @react-native-community/slider @react-native-community/viewpager react-native-vector-icons
 npm i --save-dev reactotron-react-native reactotron-redux reactotron-redux-saga redux-immutable-state-invariant remote-redux-devtools
 react-native link react-native-vector-icons
+react-native link @react-native-community/async-storage
+react-native link @react-native-community/slider
+react-native link @react-native-community/viewpager
 ```
 2. Open the android folder in Android Studio
 3. Open Tools > Android > AVD Manager
@@ -98,10 +105,6 @@ import {name as appName} from './app.json';
 
 AppRegistry.registerComponent(appName, () => App);
 ```
-
-## Useful commands
-* Ctrl + M = Open Menu > Enable Hot Reload, Enable Debugging
-* [react-devtools](https://www.npmjs.com/package/react-devtools)
 
 ## Learning React, Redux Thunk & Redux Saga
 [Pluralsight Free Subscription](https://devopscube.com/pluralsight-free-subscription/)
@@ -524,6 +527,69 @@ const style = StyleSheet.create({
 	}
 });
 ```
+
+## Axios API
+
+```
+import axios from 'axios';
+
+const client = axios.create({
+  baseURL:'http://localhost:3000/'
+});
+
+if(__DEV__)
+{
+  client.interceptors.request.use(request => {
+    console.log('Api Request Starting:', request);
+    return request;
+  }, error => {
+    console.log('Api Request Error:', error.message);
+    return Promise.reject(error);
+  });
+  
+  client.interceptors.response.use(response => {
+    console.log('Api Response Success:', response.data);
+    return response;
+  }, error => {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log('Api Response Error:', error.response);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log('Api No Response:', error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Api Request Error:', error.message);
+    }
+    return Promise.reject(error);
+  });
+}
+
+class Api {
+  constructor(client) {
+		this.client = client;
+	}
+  
+   async getEvents() {
+    let response = await this.client.get(new Date());
+    return response.data;
+  }
+
+    async  saveEvent(payload) {
+      let response =  await this.client.post('events', { title: payload.title, date: payload.date, id: uuid()});
+      return response.data;
+    }
+}
+
+export default new Api(client);
+```
+
+## React Native Components
+* View
+* Text
 
 ## Authors
 
