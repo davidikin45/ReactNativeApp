@@ -9,6 +9,12 @@
 * Native (UI) and JavaScript (React) threads 
 * Use FlatList or SectionList instead of ScrollView
 
+## Debugging Tools
+* [reactotron](https://github.com/infinitered/reactotron)
+* [remote-redux-devtools](https://github.com/zalmoxisus/remote-redux-devtools)
+* [remotedev-server](https://github.com/zalmoxisus/remotedev-server)
+* [remotedev.io](http://remotedev.io/local/) OR [http://localhost:8000](http://localhost:8000)
+
 ## Install Node.js, JDK, Python 2, expo-cli & react-native-cli, react-devtools
 * [Getting Started with Expo CLI and React Native CLI](https://facebook.github.io/react-native/docs/getting-started)
 
@@ -23,6 +29,7 @@ choco install -y python2 jdk8
 npm install -g expo-cli
 npm install -g react-native-cli
 npm install -g react-devtools
+npm install -g remotedev-server
 ```
 4. Install [Android Studio](https://developer.android.com/studio/) following the instructions [Building Projects with Native Code](https://facebook.github.io/react-native/docs/getting-started) documentation.
 5. On phone download 'Expo' app.
@@ -34,6 +41,7 @@ c:\Users\YOUR_USERNAME\AppData\Local\Android\Sdk
 ```
 c:\Users\YOUR_USERNAME\AppData\Local\Android\Sdk\platform-tools
 ```
+8. [Install reactotron](https://github.com/infinitered/reactotron)
 
 ## Setting up a new project
 * [New React Native App](https://levelup.gitconnected.com/expo-vs-react-native-cli-a-guide-to-bootstrapping-new-react-native-apps-6f0fcafee58f)
@@ -42,24 +50,28 @@ c:\Users\YOUR_USERNAME\AppData\Local\Android\Sdk\platform-tools
 ```
 react-native init myapp
 cd myapp
-npm install --save react-navigation
+npm install --save react-navigation axios redux react-redux redux-persist redux-thunk redux-saga redux-logger reselect ramda @react-native-community/async-storage @react-native-community/slider @react-native-community/viewpager react-native-vector-icons
+npm i --save-dev reactotron-react-native reactotron-redux reactotron-redux-saga redux-immutable-state-invariant remote-redux-devtools
+react-native link react-native-vector-icons
 ```
-2. Add the following to App.js to debug http calls
-```
-GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest
-```
-3. Open the android folder in Android Studio
-4. Open Tools > Android > AVD Manager
-5. Create new Virtual Device OR Settings > About phone > Sotware information > Build number x7, Enable Settings > Developer Options > USB debugging, ADB WiFi Connect
-6. Launch virtual device
+2. Open the android folder in Android Studio
+3. Open Tools > Android > AVD Manager
+4. Create new Virtual Device OR Settings > About phone > Sotware information > Build number x7, Enable Settings > Developer Options > USB debugging, ADB WiFi Connect
+5. Launch virtual device
 ![alt text](virtual-device.jpg "Virtual Device")
 
 ```
 cd "%USERPROFILE%\AppData\Local\Android\sdk\emulator" && .\emulator -avd default
 ```
-7. In terminal run the following commands
+6. In terminal run the following commands
 ```
+adb reverse tcp:8081 tcp:8081 //debugger
+adb reverse tcp:9090 tcp:9090 //reactotron
+adb reverse tcp:3000 tcp:3000 //json-server
+adb reverse tcp:8000 tcp:8000 //remotedev-server
+
 react-devtools
+remotedev --hostname=localhost --port=8000
 ```
 ```
 cd myapp
@@ -71,31 +83,13 @@ cd myapp
 react-native run-android
 ```
 
-## Api Logging to Chrome Dev Tools
+## Api Logging
 
 index.js
 ```
 if (__DEV__) {
-    // Route network requests through Chrome's native XMLHttpRequest
-    GLOBAL.XMLHttpRequest = GLOBAL.originalXMLHttpRequest || GLOBAL.XMLHttpRequest;
-  
-    // Use native FormData for native XMLHttpRequest set above
-    GLOBAL.FormData = GLOBAL.originalFormData ? GLOBAL.originalFormData : GLOBAL.FormData;
-
-    // Use native Blob for native XMLHttpRequest set above
-    GLOBAL.Blob = GLOBAL.originalBlob || GLOBAL.Blob;
-  
-    // Use native FileReader to read native Blob set above
-    GLOBAL.FileReader = GLOBAL.originalFileReader || GLOBAL.FileReader;
-
-    // fetch logger
-    global._fetch = fetch;
-    global.fetch = function (uri, options, ...args) {
-    return global._fetch(uri, options, ...args).then((response) => {
-        console.log('Fetch', { request: { uri, options, ...args }, response });
-        return response;
-    });
-    };
+    // Reactotron
+    import('./ReactotronConfig').then(() => console.log('Reactotron Configured'));
 }
   
 import {AppRegistry} from 'react-native';
@@ -141,7 +135,7 @@ export default EventList;
 ```
 ## React Native Stateful Component with Hooks
 ```
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FlatList, Text } from 'react-native';
 
 import EventCard from './EventCard';
@@ -176,7 +170,7 @@ const EventList = (props) =>  {
 export default EventList;
 ```
 ```
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Example = () => {
   // Declare a new state variable, which we'll call "count"
@@ -361,7 +355,7 @@ export default EventList;
 * In a class component we use this.setState({ count: this.state.count + 1 } but in a function component (aka stateless component) we just use setCount(count + 1).
 
 ```
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 function Example() {
   // Declare a new state variable, which we'll call "count"
@@ -379,6 +373,16 @@ function Example() {
   useEffect(() => {
     
   }, [count]);
+
+   const prevCount = usePrevious(prevCount);
+   const prevSuccess = usePrevious(props.success);
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }
   
   // Combination of componentDidMount, componentDidUpdate and ComponentWillUnmount:
   useEffect(() => {
@@ -404,7 +408,7 @@ function Example() {
 }
 ```
 ```
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Example = () => {
   // Declare a new state variable, which we'll call "count"
@@ -422,6 +426,16 @@ const Example = () => {
   useEffect(() => {
     
   }, [count]);
+
+   const prevCount = usePrevious(prevCount);
+   const prevSuccess = usePrevious(props.success);
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }
   
   // Combination of componentDidMount, componentDidUpdate and ComponentWillUnmount:
   useEffect(() => {

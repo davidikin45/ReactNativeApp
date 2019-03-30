@@ -8,13 +8,27 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.2.2",
+    "@react-native-community/slider": "^1.0.4",
+    "@react-native-community/viewpager": "^1.1.5",
+    "axios": "^0.18.0",
+    "keymirror": "^0.1.1",
     "moment": "^2.24.0",
+    "ramda": "^0.26.1",
     "react": "16.8.3",
     "react-native": "0.59.2",
     "react-native-action-button": "^2.8.5",
     "react-native-gesture-handler": "^1.1.0",
     "react-native-modal-datetime-picker": "^6.1.0",
-    "react-navigation": "^3.5.1"
+    "react-native-vector-icons": "^6.4.2",
+    "react-navigation": "^3.5.1",
+    "react-redux": "^6.0.1",
+    "redux": "^4.0.1",
+    "redux-logger": "^3.0.6",
+    "redux-persist": "^5.10.0",
+    "redux-saga": "^1.0.2",
+    "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0"
   },
   "devDependencies": {
     "@babel/core": "7.4.0",
@@ -24,7 +38,12 @@
     "eslint": "5.15.3",
     "jest": "24.5.0",
     "metro-react-native-babel-preset": "0.53.1",
-    "react-test-renderer": "16.8.3"
+    "react-test-renderer": "16.8.3",
+    "reactotron-react-native": "^3.2.1",
+    "reactotron-redux": "^3.1.0",
+    "reactotron-redux-saga": "^4.2.1",
+    "redux-immutable-state-invariant": "^2.1.0",
+    "remote-redux-devtools": "^0.5.16"
   },
   "jest": {
     "preset": "react-native"
