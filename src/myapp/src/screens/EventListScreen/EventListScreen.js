@@ -7,7 +7,7 @@ import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 import api from '../../api';
 
 import EventCard from '../../components/Event/EventCard/EventCard';
-import styles from './EventListScreenStyle';
+import styles from './EventListScreen.module';
 import { getEvents } from '../../store/state/Event/actions';
 import {mappedEventsSelector} from '../../store/state/Event/selectors';
 

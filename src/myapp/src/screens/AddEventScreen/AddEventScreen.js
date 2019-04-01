@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 import api from '../../api';
 
-import styles from './AddEventScreenStyle';
+import styles from './AddEventScreen.module';
 import { addEvent } from '../../store/state/Event/actions';
 
 const AddEventScreen = (props) => {

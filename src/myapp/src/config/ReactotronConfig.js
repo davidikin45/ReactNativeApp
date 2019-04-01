@@ -2,7 +2,7 @@ import Reactotron, {trackGlobalErrors, openInEditor, overlay, asyncStorage, netw
 import {reactotronRedux} from 'reactotron-redux';
 import sagaPlugin from 'reactotron-redux-saga';
 
-Reactotron
+const reactotron = Reactotron
   .configure({
     name: 'React Native App'
   })
@@ -16,4 +16,6 @@ Reactotron
   .useReactNative() // add all built-in react native plugins
   .connect(); // let's connect!
 
-  Reactotron.clear();
+  reactotron.clear();
+
+  export default reactotron

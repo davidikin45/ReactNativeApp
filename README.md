@@ -15,6 +15,7 @@
 * [remotedev-server](https://github.com/zalmoxisus/remotedev-server)
 * [remotedev.io](http://remotedev.io/local/) OR [http://localhost:8000](http://localhost:8000)
 * [https://httpstat.us/]
+* [json-server](https://github.com/typicode/json-server)
 
 ## Useful commands
 * Ctrl + M = Open Menu > Enable Hot Reload, Enable Debugging
@@ -34,6 +35,7 @@ npm install -g expo-cli
 npm install -g react-native-cli
 npm install -g react-devtools
 npm install -g remotedev-server
+npm install -g json-server
 ```
 4. Install [Android Studio](https://developer.android.com/studio/) following the instructions [Building Projects with Native Code](https://facebook.github.io/react-native/docs/getting-started) documentation.
 5. On phone download 'Expo' app.
@@ -79,6 +81,7 @@ adb reverse tcp:8000 tcp:8000 //remotedev-server
 
 react-devtools
 remotedev --hostname=localhost --port=8000
+json-server --host 0.0.0.0 db.json
 ```
 ```
 cd myapp
@@ -104,6 +107,29 @@ import App from './App';
 import {name as appName} from './app.json';
 
 AppRegistry.registerComponent(appName, () => App);
+```
+
+ReactotronConfig.js
+```
+import Reactotron, {trackGlobalErrors, openInEditor, overlay, asyncStorage, networking} from 'reactotron-react-native'
+import {reactotronRedux} from 'reactotron-redux';
+import sagaPlugin from 'reactotron-redux-saga';
+
+Reactotron
+  .configure({
+    name: 'React Native App'
+  })
+  .use(trackGlobalErrors())
+  .use(openInEditor())
+  .use(overlay())
+  .use(asyncStorage())
+  .use(networking())
+  .use(reactotronRedux())
+  .use(sagaPlugin())
+  .useReactNative() // add all built-in react native plugins
+  .connect(); // let's connect!
+
+  Reactotron.clear();
 ```
 
 ## Learning React, Redux Thunk & Redux Saga
@@ -589,7 +615,21 @@ export default new Api(client);
 
 ## React Native Components
 * View
+* KeyboardAvoidingView
+* ScrollView (Not virtualized)
+* VirtualizedList, FlatList, SectionList
+* Image
 * Text
+* TextInput
+* TouchableNativeFeedback, TouchableWithoutFeedback, TouchableOpacity,TouchableHighlight, Button
+* AsyncStorage
+
+## React Native Modules
+* React-native-camera
+* React-native-permissions
+* React-native-conteact-list
+* React-native-maps
+* React-native-image-picker
 
 ## Authors
 
