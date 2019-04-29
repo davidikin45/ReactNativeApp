@@ -12,10 +12,10 @@
 ## Debugging Tools
 * [reactotron](https://github.com/infinitered/reactotron)
 * [remote-redux-devtools](https://github.com/zalmoxisus/remote-redux-devtools)
-* [remotedev-server](https://github.com/zalmoxisus/remotedev-server)
-* [remotedev.io](http://remotedev.io/local/) OR [http://localhost:8000](http://localhost:8000)
-* [https://httpstat.us/]
+* [remotedev-server](https://github.com/zalmoxisus/remotedev-server) - [http://localhost:8000](http://localhost:8000) OR [remotedev.io](http://remotedev.io/local/)
+* [https://httpstat.us/](https://httpstat.us/)
 * [json-server](https://github.com/typicode/json-server)
+* [sentry.io](https://sentry.io)
 
 ## Useful commands
 * Ctrl + M = Open Menu > Enable Hot Reload, Enable Debugging
@@ -36,6 +36,7 @@ npm install -g react-native-cli
 npm install -g react-devtools
 npm install -g remotedev-server
 npm install -g json-server
+npm install -g react-native-create-library
 ```
 4. Install [Android Studio](https://developer.android.com/studio/) following the instructions [Building Projects with Native Code](https://facebook.github.io/react-native/docs/getting-started) documentation.
 5. On phone download 'Expo' app.
@@ -56,12 +57,15 @@ c:\Users\YOUR_USERNAME\AppData\Local\Android\Sdk\platform-tools
 ```
 react-native init myapp
 cd myapp
-npm install --save react-navigation axios redux react-redux redux-persist redux-thunk redux-saga redux-logger reselect ramda @react-native-community/async-storage @react-native-community/slider @react-native-community/viewpager react-native-vector-icons
+npm install --save react-navigation axios redux react-redux redux-persist redux-thunk redux-saga redux-logger reselect ramda @react-native-community/async-storage @react-native-community/slider @react-native-community/viewpager react-native-vector-icons react-native-permissions react-native-firebase react-native-sentry
 npm i --save-dev reactotron-react-native reactotron-redux reactotron-redux-saga redux-immutable-state-invariant remote-redux-devtools
 react-native link react-native-vector-icons
 react-native link @react-native-community/async-storage
 react-native link @react-native-community/slider
 react-native link @react-native-community/viewpager
+react-native link react-native-firebase 
+react-native link react-native-sentry
+react-native link react-native-device-info
 ```
 2. Open the android folder in Android Studio
 3. Open Tools > Android > AVD Manager
@@ -93,6 +97,39 @@ cd myapp
 react-native run-android
 ```
 
+## Project Structure
+* components
+* config
+  * ReactotronConfig.js
+* hoc
+  * withErrorHandler
+    * withErrorHandler.js
+  * Wrap.js
+* navigators
+  * index.js
+* screens
+  * XXXScreen.js
+  * XXXScreen.module.js
+* shared
+  * utility.js
+* store
+  * state
+    * actions.js
+    * actionTypes.js
+    * reducers.js
+    * sagas.js
+      * StorePart
+        * actions.js
+        * reducer.js
+        * sagas.js
+        * selectors.js
+  * combineReducers.js
+  * configureStore.js
+  * initSagas.js
+* api-request-helper.js
+* api.js
+* App.js
+
 ## Api Logging
 
 index.js
@@ -115,7 +152,7 @@ import Reactotron, {trackGlobalErrors, openInEditor, overlay, asyncStorage, netw
 import {reactotronRedux} from 'reactotron-redux';
 import sagaPlugin from 'reactotron-redux-saga';
 
-Reactotron
+const reactotron = Reactotron
   .configure({
     name: 'React Native App'
   })
@@ -129,7 +166,9 @@ Reactotron
   .useReactNative() // add all built-in react native plugins
   .connect(); // let's connect!
 
-  Reactotron.clear();
+  reactotron.clear();
+
+  export default reactotron
 ```
 
 ## Learning React, Redux Thunk & Redux Saga
@@ -139,6 +178,7 @@ Reactotron
 1. [A Practical Start with React](https://app.pluralsight.com/library/courses/react-practical-start)
 2. [Redux Thunk Fundamentals](https://app.pluralsight.com/library/courses/redux-fundamentals/table-of-contents)
 3. [Redux Saga](https://app.pluralsight.com/library/courses/redux-saga/table-of-contents)
+4. [Styling React Components](https://app.pluralsight.com/library/courses/react-styling-components/table-of-contents)
 
 ## Learning React Native
 * [React Native: Getting Started](https://app.pluralsight.com/library/courses/react-native-getting-started/table-of-contents)
@@ -630,6 +670,131 @@ export default new Api(client);
 * React-native-conteact-list
 * React-native-maps
 * React-native-image-picker
+
+## Animations
+* Add UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true); to index.js
+* LayoutAnimations in case of easy transitions
+* Animations for everything else
+* use nativeDriver
+
+## Native Modules
+* [react-native-create-library](https://facebook.github.io/react-native/docs/native-modules-setup)
+* [react-native-create-bridge](https://github.com/peggyrayzis/react-native-create-bridge)
+
+## Releasing for Android
+* (Android Release)[https://flutter.io/android-release/]
+1. android\app\build.gradle applicationId "com.example.myapp" must be unique and match with package="com.example.myapp" in android\app\src\main\AndroidMainifest.xml
+2. upgrade android\app\src\build.gradle defaultConfig versionCode > Internal and versionName > external each time a release is made.
+3. Create a key store
+```
+keytool -genkey -v -keystore c:\keys\key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
+```
+4. Create new file android\key.properties
+```
+storePassword=<password from previous step>
+keyPassword=<password from previous step>
+keyAlias=key
+storeFile=C:/keys/key.jks
+```
+5. Add key.properties to .gitignore
+6. add the following lines aboe android in android\app\main\build.gradle
+```
+def keystorePropertiesFile = rootProject.file("key.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+```
+7. Replace buildTypes with the following
+```
+signingConfigs {
+    release {
+     keyAlias keystoreProperties['keyAlias']
+     keyPassword keystoreProperties['keyPassword']
+     storeFile file(keystoreProperties['storeFile'])
+     storePassword keystoreProperties['storePassword']
+  }
+}
+buildTypes {
+  release {
+    signingConfig signingConfigs.release
+    minifyEnabled enableProguardInReleaseBuilds
+    proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+  }
+}
+```
+8. Run the following command
+```
+cd android
+./gradlew assembleRelease
+```
+9. Outputs to the following directory
+```
+app\build\outputs\apk\release\app-release.apk
+```
+10. Run with the following command
+```
+react-native run-android --variant=release
+```
+11. Go to Google Play Console
+
+## Tracking Users with Firebase, Crashlytics and Sentry.io
+1. Install react-native-firebase
+```
+npm install react-native-firebase
+npm install react-native-sentry --save
+react-native link react-native-firebase
+react-native link react-native-sentry
+```
+2. Setup new react native firebase project
+3. Analytics.js
+```
+import Firebase from 'react-native-firebase'
+
+const analytics = Firebase.analytics();
+analytics.setAnalyticsCollectionEnabled(true);
+
+const logScreenView = (screenNAme, className) => analytics.setCurrentScreen(screenName, className);
+
+export { logScreenView };
+```
+
+4. Usage:
+
+```
+import * as Analytics from '../../lib/analytics';
+
+Analytics.logScreenView('NewItemScreen','AddNewItemScreen');
+```
+5. [sentry.io](https://sentry.io)
+6. index.js
+```
+import { Sentry } from 'react-native-sentry';
+Sentry.config('https://xx.xx.xx.io/29875').install();
+```
+7. android\app\build.grade
+```
+apply from: "../../node_modules/react-native/react.gradle"
+
+project.ext.sentryCli = [
+    logLevel: "debug"
+]
+
+apply from: "../../node_modules/react-native-sentry/sentry.gradle"
+```
+8. android\sentry.properties using [AuthToken](https://sentry.io/settings/account/api/auth-tokens/)
+```
+defaults.url=https://sentry.io/
+defaults.org=david-ikin
+defaults.project=react-native
+auth.token=
+```
+
+## Code Push
+* Update JS files without reploying app
+* Cannot update native modules
+
+## CI/CD - Bitrise and Fastlane
 
 ## Authors
 

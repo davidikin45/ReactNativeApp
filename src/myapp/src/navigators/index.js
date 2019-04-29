@@ -4,6 +4,7 @@ import { createAppContainer, createStackNavigator, createBottomTabNavigator  } f
 
 import Icon from '../components/UI/Icon/Icon';
 
+import AnimationsScreen from '../screens/AnimationsScreen/AnimationsScreen';
 import EventListScreen from "../screens/EventListScreen/EventListScreen";
 import AddEventScreen from "../screens/AddEventScreen/AddEventScreen";
 
@@ -30,6 +31,12 @@ const ElementInformatioNavigator = createStackNavigator({
 });
 
 const TabNavigator = createBottomTabNavigator ({
+	Animations: {
+		screen: AnimationsScreen,
+		navigationOptions: {
+			tabBarLabel: 'Animations'
+		}
+	},
 	ListScreen: {
 		screen: EventListScreen,
 		navigationOptions: {

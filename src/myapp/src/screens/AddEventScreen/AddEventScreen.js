@@ -78,7 +78,7 @@ const AddEventScreen = (props) => {
 
     props.addEvent(event);
   }
-  
+
   return (
     <View
       style={{

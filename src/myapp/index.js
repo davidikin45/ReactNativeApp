@@ -1,7 +1,10 @@
-import {AppRegistry} from 'react-native';
+import {AppRegistry, UIManager} from 'react-native';
 import App from './src/App';
 import {name as appName} from './app.json';
 import axios from 'axios';
+import {Sentry} from 'react-native-sentry';
+
+let dsn = 'https://7d286949a9db4a239895e348a705bff0@sentry.io/1446565';
 
 if (__DEV__) {
       // Route network requests through Chrome's native XMLHttpRequest
@@ -27,5 +30,12 @@ if (__DEV__) {
 
     import('./src/config/ReactotronConfig').then(() => console.log('Reactotron Configured'));
 }
+else
+{
+   //Send errors to Sentry in Production.
+   Sentry.config(dsn).install();
+}
+
+UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 
 AppRegistry.registerComponent(appName, () => App);

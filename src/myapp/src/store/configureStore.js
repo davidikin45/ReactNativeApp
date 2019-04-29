@@ -47,12 +47,12 @@ if (__DEV__) {
     const middlewareEnhancer = applyMiddleware(...middleware);
 
     //remote redux dev tools
-    const composeEnhancers = composeWithDevTools({ realtime: true, port: 8000 });
+    const composeEnhancers = composeWithDevTools({ name: 'React Native App', realtime: true, port: 8000 });
 
     //http://remotedev.io/local/
     //const composeEnhancers = composeWithDevTools();
 
-    const reactotronEnhancer = Reactotron.createEnhancer();
+    const reactotronEnhancer = Reactotron.createEnhancer({ name: 'React Native App' });
 
     const devToolsEnhancer = composeEnhancers(middlewareEnhancer, reactotronEnhancer);
 
